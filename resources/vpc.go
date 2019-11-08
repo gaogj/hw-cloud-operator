@@ -1,7 +1,6 @@
 package Api
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -92,9 +91,6 @@ func (vr VPCGetRequest) Do() (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	//body,err := ioutil.ReadAll(res.Body)
-	//fmt.Println(string(body))
 
 	return res, nil
 }
@@ -194,16 +190,10 @@ func (sr SubnetGetRequest) Do() (*http.Response, error){
 
 	req, _ := newRequest(method, url)
 
-
-	fmt.Println(req)
-
 	res, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
-
-	//body,err := ioutil.ReadAll(res.Body)
-	//fmt.Println(string(body))
 
 	return res, nil
 }
