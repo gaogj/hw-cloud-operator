@@ -17,14 +17,14 @@ type IAM struct {
 	//GetUserByGroup UserByGroupGet
 }
 
-func NewResources(ProjectId string) *Resources {
+func NewResources() *Resources {
 	return &Resources{
 		VPC: &VPC{
-			Get: newVPCGetFunc(ProjectId),
-			GetSubnet: newSubnetGetFunc(ProjectId),
+			Get: newVPCGetFunc(),
+			GetSubnet: newSubnetGetFunc(),
 		},
 		IAM: &IAM{
-			GetUser: newUserGetFunc(ProjectId),
+			GetUser: newUserGetFunc(),
 		},
 	}
 }

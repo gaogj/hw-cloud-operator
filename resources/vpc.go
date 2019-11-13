@@ -1,17 +1,15 @@
 package Api
 
 import (
+	"github.com/gaogj/hw-cloud-operator/utils"
 	"github.com/pkg/errors"
 	"net/http"
 )
 
-const category string  = "vpc"
-
 //VPCGet
-func newVPCGetFunc(ProjectId string) VPCGet {
+func newVPCGetFunc() VPCGet {
 	return func(endpoint string, o ...func(*VPCGetRequest)) (*http.Response, error) {
 		var r = VPCGetRequest{
-			ProjectId: ProjectId,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -24,7 +22,6 @@ func newVPCGetFunc(ProjectId string) VPCGet {
 type VPCGet func(endpoint string, o ...func(*VPCGetRequest)) (*http.Response, error)
 
 type VPCGetRequest struct {
-	ProjectId string
 	Endpoint string
 
 	Marker string
@@ -33,13 +30,18 @@ type VPCGetRequest struct {
 }
 
 func (vr VPCGetRequest) Do() (*http.Response, error) {
-	if vr.ProjectId == "" {
-		return nil,errors.New("Can't find the Endpoint")
+	var Endpoints = utils.Endpoints[vr.Endpoint].(map[string]string)
+
+	if Endpoints["projectId"] == "" {
+		return nil,errors.New("Can't find the Endpoint projectId")
+	}
+	if Endpoints["host"] == "" {
+		return nil,errors.New("Can't find the Endpoint host")
 	}
 
 	RequestInfo := RequestInfo{
-		projectId: vr.ProjectId,
-		endpoint: vr.Endpoint,
+		projectId: Endpoints["projectId"],
+		endpoint: Endpoints["host"],
 		apiVersion: "v1",
 		category: "vpc",
 		apiObject: "vpcs",
@@ -86,10 +88,9 @@ func (vg VPCGet) WithLimit(Limit string) func(*VPCGetRequest) {
 }
 
 //SubnetGet
-func newSubnetGetFunc(ProjectId string) SubnetGet {
+func newSubnetGetFunc() SubnetGet {
 	return func(endpoint string, o ...func(*SubnetGetRequest)) (*http.Response, error) {
 		var r = SubnetGetRequest{
-			ProjectId: ProjectId,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -102,7 +103,6 @@ func newSubnetGetFunc(ProjectId string) SubnetGet {
 type SubnetGet func(endpoint string, o ...func(*SubnetGetRequest)) (*http.Response, error)
 
 type SubnetGetRequest struct {
-	ProjectId string
 	Endpoint string
 
 	Marker string
@@ -111,13 +111,18 @@ type SubnetGetRequest struct {
 }
 
 func (sr SubnetGetRequest) Do() (*http.Response, error){
-	if sr.ProjectId == "" {
-		return nil,errors.New("Can't find the Endpoint")
+	var Endpoints = utils.Endpoints[sr.Endpoint].(map[string]string)
+
+	if Endpoints["projectId"] == "" {
+		return nil,errors.New("Can't find the Endpoint projectId")
+	}
+	if Endpoints["host"] == "" {
+		return nil,errors.New("Can't find the Endpoint host")
 	}
 
 	RequestInfo := RequestInfo{
-		projectId: sr.ProjectId,
-		endpoint: sr.Endpoint,
+		projectId: Endpoints["projectId"],
+		endpoint: Endpoints["host"],
 		apiVersion: "v1",
 		category: "vpc",
 		apiObject: "subnets",

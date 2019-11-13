@@ -41,11 +41,28 @@ func InitHttpClient(config *utils.Config) {
 	Sign = &utils.Signer{
 		Key:    config.AccessKey,
 		Secret: config.SecretAccessKey,
+		Id:     config.AccountId,
 	}
 }
 
 func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 	var path strings.Builder
+
+	if RequestInfo.endpoint == "" {
+		return nil, errors.New("endpoint can't be empty")
+	}
+
+	if RequestInfo.category == "" {
+		return nil, errors.New("category can't be empty")
+	}
+
+	if RequestInfo.method == "" {
+		return nil, errors.New("method can't be empty")
+	}
+
+	if RequestInfo.scheme == "" {
+		return nil, errors.New("scheme can't be empty")
+	}
 
 	if RequestInfo.apiVersion == "" {
 		return nil, errors.New("apiVersion can't be empty")
@@ -69,21 +86,7 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 		path.WriteString(RequestInfo.resourceId)
 	}
 
-	if RequestInfo.endpoint == "" {
-		return nil, errors.New("endpoint can't be empty")
-	}
 
-	if RequestInfo.category == "" {
-		return nil, errors.New("category can't be empty")
-	}
-
-	if RequestInfo.method == "" {
-		return nil, errors.New("method can't be empty")
-	}
-
-	if RequestInfo.scheme == "" {
-		return nil, errors.New("scheme can't be empty")
-	}
 
 	apiEndpoint := RequestInfo.category +  "." + RequestInfo.endpoint
 
@@ -116,7 +119,7 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 	r.Header.Add("content-type", "application/json")
 
 	if RequestInfo.projectId == "" {
-		r.Header.Add("X-Domain-Id", "a2f58a7bbf264053ab03375e7dbf9501")
+		r.Header.Add("X-Domain-Id", Sign.Id)
 	}
 
 	Sign.Sign(r)

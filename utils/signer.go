@@ -168,6 +168,7 @@ func AuthHeaderValue(signature, accessKey string, signedHeaders []string) string
 type Signer struct {
 	Key    string
 	Secret string
+	Id string
 }
 
 // SignRequest set Authorization header

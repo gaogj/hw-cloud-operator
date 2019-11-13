@@ -1,17 +1,17 @@
 package Api
 
 import (
+	"github.com/gaogj/hw-cloud-operator/utils"
 	"net/http"
 	//"net/url"
 	//"strings"
-	//_ "github.com/pkg/errors"
+	"github.com/pkg/errors"
 )
 
 //UserGet
-func newUserGetFunc(ProjectId string) UserGet {
+func newUserGetFunc() UserGet {
 	return func(endpoint string, o ...func(*UserGetRequest)) (*http.Response, error) {
 		var r = UserGetRequest{
-			ProjectId: ProjectId,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -32,8 +32,14 @@ type UserGetRequest struct {
 }
 
 func (vr UserGetRequest) Do() (*http.Response, error) {
+	var Endpoints = utils.Endpoints[vr.Endpoint].(map[string]string)
+
+	if Endpoints["host"] == "" {
+		return nil,errors.New("Can't find the Endpoint host")
+	}
+
 	RequestInfo := RequestInfo{
-		endpoint: vr.Endpoint,
+		endpoint: Endpoints["host"],
 		apiVersion: "v3",
 		category: "iam",
 		apiObject: "users",

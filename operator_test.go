@@ -26,31 +26,31 @@ import (
 //	fmt.Println(string(body))
 //}
 ////
-//func TestNewSubnetOperator(t *testing.T) {
-//	operator := NewOperator(&utils.Config{
-//		AccessKey: "*****",
-//		SecretAccessKey: "*****",
-//		ProjectId: "*****",
-//	})
-//
-//	res,err := operator.Resources.VPC.GetSubnet(operator.Endpoints["bj1"])
-//
-//	if err != nil {
-//		fmt.Println(err)
-//	}
-//
-//	body,err := ioutil.ReadAll(res.Body)
-//	fmt.Println(string(body))
-//}
+func TestNewSubnetOperator(t *testing.T) {
+	operator := NewOperator(&utils.Config{
+		AccessKey: "RLJDCAVZ0PT80SL3O4HP",
+		SecretAccessKey: "bBZ3CdmRWHWs79joudeGJz0ntYmIEaHWzd6a86PN",
+		AccountId: "a2f58a7bbf264053ab03375e7dbf9501",
+	})
+
+	res,err := operator.Resources.VPC.GetSubnet("bj1")
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	body,err := ioutil.ReadAll(res.Body)
+	fmt.Println(string(body))
+}
 
 func TestGetUserOperator(t *testing.T) {
 	operator := NewOperator(&utils.Config{
-		AccessKey: "*****",
-		SecretAccessKey: "*****",
-		ProjectId: "*****",
+		AccessKey: "RLJDCAVZ0PT80SL3O4HP",
+		SecretAccessKey: "bBZ3CdmRWHWs79joudeGJz0ntYmIEaHWzd6a86PN",
+		AccountId: "a2f58a7bbf264053ab03375e7dbf9501",
 	})
 
-	res,err := operator.Resources.IAM.GetUser(operator.Endpoints["bj1"],
+	res,err := operator.Resources.IAM.GetUser("bj1",
 		operator.Resources.IAM.GetUser.WithUserName("zhanghaonan"))
 
 	if err != nil {
