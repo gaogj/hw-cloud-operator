@@ -53,17 +53,11 @@ func (vr UserGetRequest) Do() (*http.Response, error) {
 		return nil,errors.New("Can't find the Endpoint")
 	}
 	vr.Endpoint = category + "." + vr.Endpoint
-
 	path.WriteString("/")
 	path.WriteString(apiVersion)
 
 	path.WriteString("/")
 	path.WriteString(apiObject)
-
-	//if vr.ResourceId != "" {
-	//	path.WriteString("/")
-	//	path.WriteString(vr.ResourceId)
-	//}
 
 	url := &url.URL{
 		Scheme: scheme,
