@@ -10,19 +10,19 @@ import (
 //
 func TestVPCNewOperator(t *testing.T) {
 	operator := NewOperator(&utils.Config{
-		AccessKey: "RLJDCAVZ0PT80SL3O4HP",
-		SecretAccessKey: "bBZ3CdmRWHWs79joudeGJz0ntYmIEaHWzd6a86PN",
-		AccountId: "a2f58a7bbf264053ab03375e7dbf9501",
+		AccessKey: "********",
+		SecretAccessKey: "********",
+		AccountId: "********",
 		Endpoints: 	map[string]utils.Endpoint{
 			"bj1": utils.Endpoint{
 				Host: "cn-north-1.myhuaweicloud.com",
-				ProjectId: "4e7b816ca6524ef3a0700dba02a00458",
+				ProjectId: "********",
 			},
 		},
 	})
 
 	res,err := operator.Resources.VPC.GetVPC("bj1",
-		operator.Resources.VPC.GetVPC.WithResourceId("11016528-834a-4ee6-b130-89620a674a4c"))
+		operator.Resources.VPC.GetVPC.WithResourceId("11016528-834a-4ee6-b130-********"))
 
 	if err != nil {
 		fmt.Println(err)
@@ -34,13 +34,13 @@ func TestVPCNewOperator(t *testing.T) {
 ////
 func TestNewSubnetOperator(t *testing.T) {
 	operator := NewOperator(&utils.Config{
-		AccessKey: "RLJDCAVZ0PT80SL3O4HP",
-		SecretAccessKey: "bBZ3CdmRWHWs79joudeGJz0ntYmIEaHWzd6a86PN",
-		AccountId: "a2f58a7bbf264053ab03375e7dbf9501",
+		AccessKey: "********",
+		SecretAccessKey: "********",
+		AccountId: "********",
 		Endpoints: 	map[string]utils.Endpoint{
 			"bj1": utils.Endpoint{
 				Host: "cn-north-1.myhuaweicloud.com",
-				ProjectId: "4e7b816ca6524ef3a0700dba02a00458",
+				ProjectId: "********",
 			},
 		},
 	})
@@ -57,13 +57,13 @@ func TestNewSubnetOperator(t *testing.T) {
 
 func TestGetUserOperator(t *testing.T) {
 	operator := NewOperator(&utils.Config{
-		AccessKey: "RLJDCAVZ0PT80SL3O4HP",
-		SecretAccessKey: "bBZ3CdmRWHWs79joudeGJz0ntYmIEaHWzd6a86PN",
-		AccountId: "a2f58a7bbf264053ab03375e7dbf9501",
+		AccessKey: "********",
+		SecretAccessKey: "********",
+		AccountId: "********",
 		Endpoints: 	map[string]utils.Endpoint{
 			"bj1": utils.Endpoint{
 				Host: "cn-north-1.myhuaweicloud.com",
-				ProjectId: "4e7b816ca6524ef3a0700dba02a00458",
+				ProjectId: "********",
 			},
 		},
 	})
