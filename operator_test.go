@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"testing"
 )
+
 //
 //func TestVPCNewOperator(t *testing.T) {
 //	operator := NewOperator(&utils.Config{
@@ -14,7 +15,8 @@ import (
 //		ProjectId: "4e7b816ca6524ef3a0700dba02a00458",
 //	})
 //
-//	res,err := operator.Resources.VPC.Get(operator.Endpoints["bj1"])
+//	res,err := operator.Resources.VPC.Get(operator.Endpoints["bj1"],
+//		operator.Resources.VPC.Get.WithResourceId("11016528-834a-4ee6-b130-89620a674a4c"))
 //
 //	if err != nil {
 //		fmt.Println(err)
@@ -48,7 +50,8 @@ func TestGetUserOperator(t *testing.T) {
 		ProjectId: "4e7b816ca6524ef3a0700dba02a00458",
 	})
 
-	res,err := operator.Resources.IAM.GetUser(operator.Endpoints["bj1"])
+	res,err := operator.Resources.IAM.GetUser(operator.Endpoints["bj1"],
+		operator.Resources.IAM.GetUser.WithUserName("zhanghaonan"))
 
 	if err != nil {
 		fmt.Println(err)

@@ -4,4 +4,5 @@ type Config struct {
 	AccessKey string
 	SecretAccessKey string
 	ProjectId string
+	AccountId string
 }

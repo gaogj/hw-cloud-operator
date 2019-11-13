@@ -2,11 +2,25 @@ package Api
 
 import (
 	"github.com/gaogj/hw-cloud-operator/utils"
+	"github.com/pkg/errors"
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
+
+type RequestInfo struct {
+	category string
+	projectId string
+	endpoint string
+	method string
+	scheme string
+	apiVersion string
+	apiObject string
+	params map[string]string
+	resourceId string
+}
 
 var (
 	httpClient *http.Client
@@ -30,9 +44,57 @@ func InitHttpClient(config *utils.Config) {
 	}
 }
 
-func newRequest(method string, url *url.URL, params ...map[string]string) (*http.Request, error) {
+func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
+	var path strings.Builder
+
+	if RequestInfo.apiVersion == "" {
+		return nil, errors.New("apiVersion can't be empty")
+	}
+	path.WriteString("/")
+	path.WriteString(RequestInfo.apiVersion)
+
+	if RequestInfo.projectId != "" {
+		path.WriteString("/")
+		path.WriteString(RequestInfo.projectId)
+	}
+
+	if RequestInfo.apiObject == "" {
+		return nil, errors.New("apiObject can't be empty")
+	}
+	path.WriteString("/")
+	path.WriteString(RequestInfo.apiObject)
+
+	if RequestInfo.resourceId != "" {
+		path.WriteString("/")
+		path.WriteString(RequestInfo.resourceId)
+	}
+
+	if RequestInfo.endpoint == "" {
+		return nil, errors.New("endpoint can't be empty")
+	}
+
+	if RequestInfo.category == "" {
+		return nil, errors.New("category can't be empty")
+	}
+
+	if RequestInfo.method == "" {
+		return nil, errors.New("method can't be empty")
+	}
+
+	if RequestInfo.scheme == "" {
+		return nil, errors.New("scheme can't be empty")
+	}
+
+	apiEndpoint := RequestInfo.category +  "." + RequestInfo.endpoint
+
+	url := &url.URL{
+		Scheme: RequestInfo.scheme,
+		Host: apiEndpoint,
+		Path: path.String(),
+	}
+
 	r := &http.Request{
-		Method:     method,
+		Method:     RequestInfo.method,
 		URL:        url,
 		Proto:      "HTTP/1.1",
 		ProtoMajor: 1,
@@ -40,17 +102,23 @@ func newRequest(method string, url *url.URL, params ...map[string]string) (*http
 		Header:     make(http.Header),
 	}
 
-	if len(params) > 0 {
+	if len(RequestInfo.params) > 0 {
 		q := r.URL.Query()
-		for _, v := range params {
-			for k, vv := range v {
-				q.Set(k, vv)
-			}
+		for k, v := range RequestInfo.params {
+			q.Set(k, v)
+			//for k, vv := range v {
+			//	q.Set(k, vv)
+			//}
 		}
 		r.URL.RawQuery = q.Encode()
 	}
 
 	r.Header.Add("content-type", "application/json")
+
+	if RequestInfo.projectId == "" {
+		r.Header.Add("X-Domain-Id", "a2f58a7bbf264053ab03375e7dbf9501")
+	}
+
 	Sign.Sign(r)
 
 	return r, nil

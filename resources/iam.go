@@ -2,10 +2,9 @@ package Api
 
 import (
 	"net/http"
-	"net/url"
-	"strings"
-
-	"github.com/pkg/errors"
+	//"net/url"
+	//"strings"
+	//_ "github.com/pkg/errors"
 )
 
 //UserGet
@@ -33,48 +32,29 @@ type UserGetRequest struct {
 }
 
 func (vr UserGetRequest) Do() (*http.Response, error) {
-	var (
-		method string
-		scheme string
-		apiVersion string
-		apiObject string
-		params map[string]string
-		path   strings.Builder
-		category string  = "iam"
-	)
-
-	apiVersion = "v3"
-	apiObject = "users"
-	method = "GET"
-	scheme = "https"
-	params = make(map[string]string)
-
-	if vr.Endpoint == "" {
-		return nil,errors.New("Can't find the Endpoint")
-	}
-	vr.Endpoint = category + "." + vr.Endpoint
-	path.WriteString("/")
-	path.WriteString(apiVersion)
-
-	path.WriteString("/")
-	path.WriteString(apiObject)
-
-	url := &url.URL{
-		Scheme: scheme,
-		Host: vr.Endpoint,
-		Path: path.String(),
+	RequestInfo := RequestInfo{
+		endpoint: vr.Endpoint,
+		apiVersion: "v3",
+		category: "iam",
+		apiObject: "users",
+		method: "GET",
+		scheme: "https",
+		params: make(map[string]string),
 	}
 
 	//params
 	if vr.UserName != "" {
-		params["UserName"] = vr.UserName
+		RequestInfo.params["name"] = vr.UserName
 	}
 
 	if vr.Enabled != "" {
-		params["Enabled"] = vr.Enabled
+		RequestInfo.params["enabled"] = vr.Enabled
 	}
 
-	req, _ := newRequest(method, url, params)
+	req, err := newRequest(RequestInfo)
+	if err != nil {
+		return nil, err
+	}
 
 	res, err := httpClient.Do(req)
 	if err != nil {

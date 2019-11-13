@@ -1,11 +1,8 @@
 package Api
 
 import (
-	"net/http"
-	"net/url"
-	"strings"
-
 	"github.com/pkg/errors"
+	"net/http"
 )
 
 const category string  = "vpc"
@@ -36,56 +33,31 @@ type VPCGetRequest struct {
 }
 
 func (vr VPCGetRequest) Do() (*http.Response, error) {
-	var (
-		method string
-		scheme string
-		apiVersion string
-		apiObject string
-		params map[string]string
-		path   strings.Builder
-	)
-
-	apiVersion = "v1"
-	apiObject = "vpcs"
-	method = "GET"
-	scheme = "https"
-	params = make(map[string]string)
-
-	if vr.Endpoint == "" {
+	if vr.ProjectId == "" {
 		return nil,errors.New("Can't find the Endpoint")
 	}
-	vr.Endpoint = category + "." + vr.Endpoint
 
-	path.WriteString("/")
-	path.WriteString(apiVersion)
-
-	path.WriteString("/")
-	path.WriteString(vr.ProjectId)
-
-	path.WriteString("/")
-	path.WriteString(apiObject)
-
-	if vr.ResourceId != "" {
-		path.WriteString("/")
-		path.WriteString(vr.ResourceId)
-	}
-
-	url := &url.URL{
-		Scheme: scheme,
-		Host: vr.Endpoint,
-		Path: path.String(),
+	RequestInfo := RequestInfo{
+		projectId: vr.ProjectId,
+		endpoint: vr.Endpoint,
+		apiVersion: "v1",
+		category: "vpc",
+		apiObject: "vpcs",
+		method: "GET",
+		scheme: "https",
+		params: make(map[string]string),
 	}
 
 	//params
 	if vr.Marker != "" {
-		params["marker"] = vr.Marker
+		RequestInfo.params["marker"] = vr.Marker
 	}
 
 	if vr.Limit != "" {
-		params["limit"] = vr.Limit
+		RequestInfo.params["limit"] = vr.Limit
 	}
 
-	req, _ := newRequest(method, url, params)
+	req, _ := newRequest(RequestInfo)
 
 	res, err := httpClient.Do(req)
 	if err != nil {
@@ -139,56 +111,31 @@ type SubnetGetRequest struct {
 }
 
 func (sr SubnetGetRequest) Do() (*http.Response, error){
-	var (
-		method string
-		scheme string
-		apiVersion string
-		apiObject string
-		params map[string]string
-		path   strings.Builder
-	)
-
-	apiVersion = "v1"
-	apiObject = "subnets"
-	method = "GET"
-	scheme = "https"
-	params = make(map[string]string)
-
-
-	if sr.Endpoint == "" {
+	if sr.ProjectId == "" {
 		return nil,errors.New("Can't find the Endpoint")
 	}
-	sr.Endpoint = category + "." + sr.Endpoint
 
-	path.WriteString("/")
-	path.WriteString(apiVersion)
-
-	path.WriteString("/")
-	path.WriteString(sr.ProjectId)
-
-	path.WriteString("/")
-	path.WriteString(apiObject)
-
-	url := &url.URL{
-		Scheme: scheme,
-		Host: sr.Endpoint,
-		Path: path.String(),
+	RequestInfo := RequestInfo{
+		projectId: sr.ProjectId,
+		endpoint: sr.Endpoint,
+		apiVersion: "v1",
+		category: "vpc",
+		apiObject: "subnets",
+		method: "GET",
+		scheme: "https",
+		params: make(map[string]string),
 	}
 
 	//params
-	if sr.VPCId != "" {
-		params["vpc_id"] = sr.VPCId
-	}
-
 	if sr.Marker != "" {
-		params["marker"] = sr.Marker
+		RequestInfo.params["marker"] = sr.Marker
 	}
 
 	if sr.Limit != "" {
-		params["limit"] = sr.Limit
+		RequestInfo.params["limit"] = sr.Limit
 	}
 
-	req, _ := newRequest(method, url)
+	req, _ := newRequest(RequestInfo)
 
 	res, err := httpClient.Do(req)
 	if err != nil {
