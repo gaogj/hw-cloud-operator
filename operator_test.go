@@ -10,9 +10,9 @@ import (
 //
 //func TestVPCNewOperator(t *testing.T) {
 //	operator := NewOperator(&utils.Config{
-//		AccessKey: "NCXUWIW3NPHB89RPXXK9",
-//		SecretAccessKey: "7wf7egJGicmH2JGlfIbSGCsLy8KuJQEdj3wzEjt5",
-//		ProjectId: "4e7b816ca6524ef3a0700dba02a00458",
+//		AccessKey: "*****",
+//		SecretAccessKey: "*****",
+//		ProjectId: "*****",
 //	})
 //
 //	res,err := operator.Resources.VPC.Get(operator.Endpoints["bj1"],
@@ -28,9 +28,9 @@ import (
 ////
 //func TestNewSubnetOperator(t *testing.T) {
 //	operator := NewOperator(&utils.Config{
-//		AccessKey: "NCXUWIW3NPHB89RPXXK9",
-//		SecretAccessKey: "7wf7egJGicmH2JGlfIbSGCsLy8KuJQEdj3wzEjt5",
-//		ProjectId: "4e7b816ca6524ef3a0700dba02a00458",
+//		AccessKey: "*****",
+//		SecretAccessKey: "*****",
+//		ProjectId: "*****",
 //	})
 //
 //	res,err := operator.Resources.VPC.GetSubnet(operator.Endpoints["bj1"])
@@ -45,9 +45,9 @@ import (
 
 func TestGetUserOperator(t *testing.T) {
 	operator := NewOperator(&utils.Config{
-		AccessKey: "NCXUWIW3NPHB89RPXXK9",
-		SecretAccessKey: "7wf7egJGicmH2JGlfIbSGCsLy8KuJQEdj3wzEjt5",
-		ProjectId: "4e7b816ca6524ef3a0700dba02a00458",
+		AccessKey: "*****",
+		SecretAccessKey: "*****",
+		ProjectId: "*****",
 	})
 
 	res,err := operator.Resources.IAM.GetUser(operator.Endpoints["bj1"],
