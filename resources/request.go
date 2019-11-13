@@ -25,9 +25,12 @@ type RequestInfo struct {
 var (
 	httpClient *http.Client
 	Sign *utils.Signer
+	Endpoints map[string]utils.Endpoint
 )
 
-func InitHttpClient(config *utils.Config) {
+
+func InitHttpClient(cfg *utils.Config) {
+	Endpoints = cfg.Endpoints
 	httpClient = &http.Client{
 		Transport: &http.Transport{
 			MaxIdleConnsPerHost:   30,
@@ -39,9 +42,9 @@ func InitHttpClient(config *utils.Config) {
 	}
 
 	Sign = &utils.Signer{
-		Key:    config.AccessKey,
-		Secret: config.SecretAccessKey,
-		Id:     config.AccountId,
+		Key:    cfg.AccessKey,
+		Secret: cfg.SecretAccessKey,
+		Id:     cfg.AccountId,
 	}
 }
 

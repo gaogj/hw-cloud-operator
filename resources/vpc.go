@@ -1,7 +1,6 @@
 package Api
 
 import (
-	"github.com/gaogj/hw-cloud-operator/utils"
 	"github.com/pkg/errors"
 	"net/http"
 )
@@ -30,18 +29,16 @@ type VPCGetRequest struct {
 }
 
 func (vr VPCGetRequest) Do() (*http.Response, error) {
-	var Endpoints = utils.Endpoints[vr.Endpoint].(map[string]string)
-
-	if Endpoints["projectId"] == "" {
+	if Endpoints[vr.Endpoint].ProjectId == "" {
 		return nil,errors.New("Can't find the Endpoint projectId")
 	}
-	if Endpoints["host"] == "" {
+	if Endpoints[vr.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
 	RequestInfo := RequestInfo{
-		projectId: Endpoints["projectId"],
-		endpoint: Endpoints["host"],
+		projectId: Endpoints[vr.Endpoint].ProjectId,
+		endpoint:Endpoints[vr.Endpoint].Host,
 		apiVersion: "v1",
 		category: "vpc",
 		apiObject: "vpcs",
@@ -111,18 +108,16 @@ type SubnetGetRequest struct {
 }
 
 func (sr SubnetGetRequest) Do() (*http.Response, error){
-	var Endpoints = utils.Endpoints[sr.Endpoint].(map[string]string)
-
-	if Endpoints["projectId"] == "" {
+	if Endpoints[sr.Endpoint].ProjectId == "" {
 		return nil,errors.New("Can't find the Endpoint projectId")
 	}
-	if Endpoints["host"] == "" {
+	if Endpoints[sr.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
 	RequestInfo := RequestInfo{
-		projectId: Endpoints["projectId"],
-		endpoint: Endpoints["host"],
+		projectId: Endpoints[sr.Endpoint].ProjectId,
+		endpoint:Endpoints[sr.Endpoint].Host,
 		apiVersion: "v1",
 		category: "vpc",
 		apiObject: "subnets",

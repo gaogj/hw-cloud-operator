@@ -6,7 +6,7 @@ type Resources struct {
 }
 
 type VPC struct {
-	Get VPCGet
+	GetVPC VPCGet
 	GetSubnet SubnetGet
 	GetPublicip PublicipGet
 }
@@ -20,7 +20,7 @@ type IAM struct {
 func NewResources() *Resources {
 	return &Resources{
 		VPC: &VPC{
-			Get: newVPCGetFunc(),
+			GetVPC: newVPCGetFunc(),
 			GetSubnet: newSubnetGetFunc(),
 		},
 		IAM: &IAM{

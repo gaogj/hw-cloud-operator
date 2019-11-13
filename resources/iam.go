@@ -1,10 +1,8 @@
 package Api
 
 import (
-	"github.com/gaogj/hw-cloud-operator/utils"
+	//"github.com/gaogj/hw-cloud-operator/utils"
 	"net/http"
-	//"net/url"
-	//"strings"
 	"github.com/pkg/errors"
 )
 
@@ -32,14 +30,13 @@ type UserGetRequest struct {
 }
 
 func (vr UserGetRequest) Do() (*http.Response, error) {
-	var Endpoints = utils.Endpoints[vr.Endpoint].(map[string]string)
 
-	if Endpoints["host"] == "" {
+	if Endpoints[vr.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
 	RequestInfo := RequestInfo{
-		endpoint: Endpoints["host"],
+		endpoint:Endpoints[vr.Endpoint].Host,
 		apiVersion: "v3",
 		category: "iam",
 		apiObject: "users",
