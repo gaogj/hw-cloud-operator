@@ -89,8 +89,6 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 		path.WriteString(RequestInfo.resourceId)
 	}
 
-
-
 	apiEndpoint := RequestInfo.category +  "." + RequestInfo.endpoint
 
 	url := &url.URL{
@@ -112,9 +110,6 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 		q := r.URL.Query()
 		for k, v := range RequestInfo.params {
 			q.Set(k, v)
-			//for k, vv := range v {
-			//	q.Set(k, vv)
-			//}
 		}
 		r.URL.RawQuery = q.Encode()
 	}

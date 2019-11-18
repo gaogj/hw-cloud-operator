@@ -37,7 +37,7 @@ func (vr UserGetRequest) Do() (*http.Response, error) {
 
 	RequestInfo := RequestInfo{
 		endpoint:Endpoints[vr.Endpoint].Host,
-		apiVersion: "v3",
+		apiVersion: "v3/OS-USER",
 		category: "iam",
 		apiObject: "users",
 		method: "GET",

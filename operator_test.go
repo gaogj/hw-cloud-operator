@@ -10,8 +10,8 @@ import (
 //
 func TestVPCNewOperator(t *testing.T) {
 	operator := NewOperator(&utils.Config{
-		AccessKey: "RLJDCAVZ0PT80SL3O4HP",
-		SecretAccessKey: "bBZ3CdmRWHWs79joudeGJz0ntYmIEaHWzd6a86PN",
+		AccessKey: "FGEXLWUDPS9OJHD2DP30",
+		SecretAccessKey: "t3yIrYtyn9KZPJlCIvt0e6Dw729OXxJeUWODMjzo",
 		AccountId: "a2f58a7bbf264053ab03375e7dbf9501",
 		Endpoints: 	map[string]utils.Endpoint{
 			"bj1": utils.Endpoint{
@@ -34,8 +34,8 @@ func TestVPCNewOperator(t *testing.T) {
 ////
 func TestNewSubnetOperator(t *testing.T) {
 	operator := NewOperator(&utils.Config{
-		AccessKey: "RLJDCAVZ0PT80SL3O4HP",
-		SecretAccessKey: "bBZ3CdmRWHWs79joudeGJz0ntYmIEaHWzd6a86PN",
+		AccessKey: "FGEXLWUDPS9OJHD2DP30",
+		SecretAccessKey: "t3yIrYtyn9KZPJlCIvt0e6Dw729OXxJeUWODMjzo",
 		AccountId: "a2f58a7bbf264053ab03375e7dbf9501",
 		Endpoints: 	map[string]utils.Endpoint{
 			"bj1": utils.Endpoint{
@@ -57,8 +57,8 @@ func TestNewSubnetOperator(t *testing.T) {
 
 func TestGetUserOperator(t *testing.T) {
 	operator := NewOperator(&utils.Config{
-		AccessKey: "RLJDCAVZ0PT80SL3O4HP",
-		SecretAccessKey: "bBZ3CdmRWHWs79joudeGJz0ntYmIEaHWzd6a86PN",
+		AccessKey: "FGEXLWUDPS9OJHD2DP30",
+		SecretAccessKey: "t3yIrYtyn9KZPJlCIvt0e6Dw729OXxJeUWODMjzo",
 		AccountId: "a2f58a7bbf264053ab03375e7dbf9501",
 		Endpoints: 	map[string]utils.Endpoint{
 			"bj1": utils.Endpoint{
@@ -68,8 +68,7 @@ func TestGetUserOperator(t *testing.T) {
 		},
 	})
 
-	res,err := operator.Resources.IAM.GetUser("bj1",
-		operator.Resources.IAM.GetUser.WithUserName("zhanghaonan"))
+	res,err := operator.Resources.IAM.GetUser("bj1")
 
 	if err != nil {
 		fmt.Println(err)
