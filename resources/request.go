@@ -1,9 +1,12 @@
 package Api
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/gaogj/hw-cloud-operator/utils"
 	"github.com/pkg/errors"
+	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -19,6 +22,7 @@ type RequestInfo struct {
 	scheme string
 	apiVersion string
 	apiObject string
+	body io.Reader
 	params map[string]string
 	resourceId string
 }
@@ -97,7 +101,6 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 		Host: apiEndpoint,
 		Path: path.String(),
 	}
-	fmt.Println(url)
 
 	r := &http.Request{
 		Method:     RequestInfo.method,
@@ -114,6 +117,22 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 			q.Set(k, v)
 		}
 		r.URL.RawQuery = q.Encode()
+	}
+	fmt.Println(RequestInfo.body)
+	if RequestInfo.body != nil {
+		switch b := RequestInfo.body.(type) {
+		case *bytes.Buffer:
+			r.Body = ioutil.NopCloser(RequestInfo.body)
+			r.ContentLength = int64(b.Len())
+		case *bytes.Reader:
+			r.Body = ioutil.NopCloser(RequestInfo.body)
+			r.ContentLength = int64(b.Len())
+		case *strings.Reader:
+			r.Body = ioutil.NopCloser(RequestInfo.body)
+			r.ContentLength = int64(b.Len())
+		default:
+			r.Body = ioutil.NopCloser(RequestInfo.body)
+		}
 	}
 
 	r.Header.Add("content-type", "application/json")

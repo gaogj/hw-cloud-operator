@@ -1,9 +1,11 @@
 package Api
 
 import (
+	"bytes"
+	"encoding/json"
+	"github.com/pkg/errors"
 	//"github.com/gaogj/hw-cloud-operator/utils"
 	"net/http"
-	"github.com/pkg/errors"
 )
 
 //UserGet
@@ -67,13 +69,13 @@ func (ur UserGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (vg UserGet) WithUserName(UserName string) func(*UserGetRequest) {
+func (ug UserGet) WithUserName(UserName string) func(*UserGetRequest) {
 	return func(ur *UserGetRequest) {
 		ur.UserName = UserName
 	}
 }
 
-func (vg UserGet) WithEnabled(Enabled string) func(*UserGetRequest) {
+func (ug UserGet) WithEnabled(Enabled string) func(*UserGetRequest) {
 	return func(ur *UserGetRequest) {
 		ur.Enabled = Enabled
 	}
@@ -84,6 +86,7 @@ func newUserCreateFunc() UserCreate {
 	return func(endpoint, name, password string, o ...func(*UserCreateRequest)) (*http.Response, error) {
 		var r = UserCreateRequest{
 			Name: name,
+			Password: password,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -106,29 +109,37 @@ type UserCreateRequest struct {
 }
 
 func (uc UserCreateRequest) Do() (*http.Response, error) {
+	var body *bytes.Buffer
+
+	body = new(bytes.Buffer)
+	defer body.Reset()
 
 	if Endpoints[uc.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
 	RequestInfo := RequestInfo{
-		resourceId: uc.Name,
 		endpoint:Endpoints[uc.Endpoint].Host,
 		apiVersion: "v3",
 		category: "iam",
-		apiObject: "/users",
+		apiObject: "users",
 		method: "POST",
 		scheme: "https",
+		body: nil,
 		params: make(map[string]string),
 	}
+	//body
+	bodyString, err := json.Marshal(map[string]interface{}{
+		"user": map[string]string{
+			"name": uc.Name,
+			"password": uc.Password,
+			"description": uc.Description,
+		},
+	})
 
-	//params
-	RequestInfo.params["name"] = uc.Name
-	RequestInfo.params["password"] = uc.Password
-
-	if uc.Description != "" {
-		RequestInfo.params["description"] = uc.Description
-	}
+	body.Grow(len(bodyString))
+	body.Write(bodyString)
+	RequestInfo.body = body
 
 	req, err := newRequest(RequestInfo)
 	if err != nil {
@@ -143,8 +154,8 @@ func (uc UserCreateRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (uc UserCreateRequest) WithDescription(description string) func(*UserCreateRequest) {
-	return func(uc *UserCreateRequest) {
-		uc.Description = description
+func (uc UserCreate) WithDescription(description string) func(*UserCreateRequest) {
+	return func(ur *UserCreateRequest) {
+		ur.Description = description
 	}
 }
