@@ -143,7 +143,7 @@ func (uc UserCreateRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (vg UserGet) WithDescription(description string) func(*UserCreateRequest) {
+func (uc UserCreateRequest) WithDescription(description string) func(*UserCreateRequest) {
 	return func(uc *UserCreateRequest) {
 		uc.Description = description
 	}
