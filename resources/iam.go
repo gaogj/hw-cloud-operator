@@ -29,14 +29,14 @@ type UserGetRequest struct {
 	Enabled string
 }
 
-func (vr UserGetRequest) Do() (*http.Response, error) {
+func (ur UserGetRequest) Do() (*http.Response, error) {
 
-	if Endpoints[vr.Endpoint].Host == "" {
+	if Endpoints[ur.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
 	RequestInfo := RequestInfo{
-		endpoint:Endpoints[vr.Endpoint].Host,
+		endpoint:Endpoints[ur.Endpoint].Host,
 		apiVersion: "v3",
 		category: "iam",
 		apiObject: "users",
@@ -46,12 +46,12 @@ func (vr UserGetRequest) Do() (*http.Response, error) {
 	}
 
 	//params
-	if vr.UserName != "" {
-		RequestInfo.params["name"] = vr.UserName
+	if ur.UserName != "" {
+		RequestInfo.params["name"] = ur.UserName
 	}
 
-	if vr.Enabled != "" {
-		RequestInfo.params["enabled"] = vr.Enabled
+	if ur.Enabled != "" {
+		RequestInfo.params["enabled"] = ur.Enabled
 	}
 
 	req, err := newRequest(RequestInfo)
@@ -68,13 +68,71 @@ func (vr UserGetRequest) Do() (*http.Response, error) {
 }
 
 func (vg UserGet) WithUserName(UserName string) func(*UserGetRequest) {
-	return func(vr *UserGetRequest) {
-		vr.UserName = UserName
+	return func(ur *UserGetRequest) {
+		ur.UserName = UserName
 	}
 }
 
 func (vg UserGet) WithEnabled(Enabled string) func(*UserGetRequest) {
-	return func(vr *UserGetRequest) {
-		vr.Enabled = Enabled
+	return func(ur *UserGetRequest) {
+		ur.Enabled = Enabled
 	}
+}
+
+//GetUserInfo
+func newUserCreateFunc() UserCreate {
+	return func(endpoint, name, password string, o ...func(*UserCreateRequest)) (*http.Response, error) {
+		var r = UserCreateRequest{
+			Name: name,
+			Endpoint: endpoint,
+		}
+		for _, f := range o {
+			f(&r)
+		}
+		return r.Do()
+	}
+}
+
+type UserCreate func(endpoint, name, password string, o ...func(*UserCreateRequest)) (*http.Response, error)
+
+type UserCreateRequest struct {
+	ProjectId string
+	Endpoint string
+
+	Name string
+	Password string
+}
+
+func (uc UserCreateRequest) Do() (*http.Response, error) {
+
+	if Endpoints[uc.Endpoint].Host == "" {
+		return nil,errors.New("Can't find the Endpoint host")
+	}
+
+	RequestInfo := RequestInfo{
+		resourceId: uc.Name,
+		endpoint:Endpoints[uc.Endpoint].Host,
+		apiVersion: "v3",
+		category: "iam",
+		apiObject: "/users",
+		method: "POST",
+		scheme: "https",
+		params: make(map[string]string),
+	}
+
+	//params
+	RequestInfo.params["name"] = uc.Name
+	RequestInfo.params["password"] = uc.Password
+
+	req, err := newRequest(RequestInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }

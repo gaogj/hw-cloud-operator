@@ -1,6 +1,7 @@
 package Api
 
 import (
+	"fmt"
 	"github.com/gaogj/hw-cloud-operator/utils"
 	"github.com/pkg/errors"
 	"net"
@@ -96,6 +97,7 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 		Host: apiEndpoint,
 		Path: path.String(),
 	}
+	fmt.Println(url)
 
 	r := &http.Request{
 		Method:     RequestInfo.method,
