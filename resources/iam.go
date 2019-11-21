@@ -101,6 +101,8 @@ type UserCreateRequest struct {
 
 	Name string
 	Password string
+
+	Description string
 }
 
 func (uc UserCreateRequest) Do() (*http.Response, error) {
@@ -124,6 +126,10 @@ func (uc UserCreateRequest) Do() (*http.Response, error) {
 	RequestInfo.params["name"] = uc.Name
 	RequestInfo.params["password"] = uc.Password
 
+	if uc.Description != "" {
+		RequestInfo.params["description"] = uc.Description
+	}
+
 	req, err := newRequest(RequestInfo)
 	if err != nil {
 		return nil, err
@@ -135,4 +141,10 @@ func (uc UserCreateRequest) Do() (*http.Response, error) {
 	}
 
 	return res, nil
+}
+
+func (vg UserGet) WithDescription(description string) func(*UserCreateRequest) {
+	return func(uc *UserCreateRequest) {
+		uc.Description = description
+	}
 }
