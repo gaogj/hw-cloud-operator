@@ -3,6 +3,7 @@ package Api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/pkg/errors"
 	//"github.com/gaogj/hw-cloud-operator/utils"
 	"net/http"
@@ -32,7 +33,6 @@ type UserGetRequest struct {
 }
 
 func (ur UserGetRequest) Do() (*http.Response, error) {
-
 	if Endpoints[ur.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
@@ -83,8 +83,9 @@ func (ug UserGet) WithEnabled(Enabled string) func(*UserGetRequest) {
 
 //GetGroup
 func newGroupGetFunc() GroupGet {
-	return func(endpoint string, o ...func(*GroupGetRequest)) (*http.Response, error) {
+	return func(endpoint string, name string, o ...func(*GroupGetRequest)) (*http.Response, error) {
 		var r = GroupGetRequest{
+			GroupName: name,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -94,7 +95,7 @@ func newGroupGetFunc() GroupGet {
 	}
 }
 
-type GroupGet func(endpoint string, o ...func(*GroupGetRequest)) (*http.Response, error)
+type GroupGet func(endpoint string, name string, o ...func(*GroupGetRequest)) (*http.Response, error)
 
 type GroupGetRequest struct {
 	ProjectId string
@@ -104,7 +105,6 @@ type GroupGetRequest struct {
 }
 
 func (ug GroupGetRequest) Do() (*http.Response, error) {
-
 	if Endpoints[ug.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
@@ -219,3 +219,63 @@ func (uc UserCreate) WithDescription(description string) func(*UserCreateRequest
 	}
 }
 
+//AddUserToGroup
+func newGroupAddUserFunc() GroupAddUser {
+	return func(endpoint, groupid, userid string, o ...func(*GroupAddUserRequest)) (*http.Response, error) {
+		var r = GroupAddUserRequest{
+			GroupId: groupid,
+			UserId: userid,
+			Endpoint: endpoint,
+		}
+		for _, f := range o {
+			f(&r)
+		}
+		return r.Do()
+	}
+}
+
+type GroupAddUser func(endpoint, groupid, userid string, o ...func(*GroupAddUserRequest)) (*http.Response, error)
+
+type GroupAddUserRequest struct {
+	ProjectId string
+	Endpoint string
+
+	GroupId string
+	UserId string
+}
+
+func (gau GroupAddUserRequest) Do() (*http.Response, error) {
+	if Endpoints[gau.Endpoint].Host == "" {
+		return nil,errors.New("Can't find the Endpoint host")
+	}
+
+	if gau.UserId == "" {
+		return nil,errors.New("UserId cannot be empty")
+	}
+	if gau.GroupId == "" {
+		return nil,errors.New("GroupId cannot be empty")
+	}
+
+	RequestInfo := RequestInfo{
+		resourceId: fmt.Sprintf("%s/users/%s", gau.GroupId,gau.UserId),
+		endpoint:Endpoints[gau.Endpoint].Host,
+		apiVersion: "v3",
+		category: "iam",
+		apiObject: "groups",
+		method: "PUT",
+		scheme: "https",
+		params: make(map[string]string),
+	}
+
+	req, err := newRequest(RequestInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
