@@ -2,7 +2,6 @@ package Api
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/gaogj/hw-cloud-operator/utils"
 	"github.com/pkg/errors"
 	"io"
@@ -12,6 +11,12 @@ import (
 	"net/url"
 	"strings"
 	"time"
+)
+
+var (
+	httpClient *http.Client
+	Sign *utils.Signer
+	Endpoints map[string]utils.Endpoint
 )
 
 type RequestInfo struct {
@@ -26,13 +31,6 @@ type RequestInfo struct {
 	params map[string]string
 	resourceId string
 }
-
-var (
-	httpClient *http.Client
-	Sign *utils.Signer
-	Endpoints map[string]utils.Endpoint
-)
-
 
 func InitHttpClient(cfg *utils.Config) {
 	Endpoints = cfg.Endpoints
@@ -118,7 +116,7 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 		}
 		r.URL.RawQuery = q.Encode()
 	}
-	fmt.Println(RequestInfo.body)
+
 	if RequestInfo.body != nil {
 		switch b := RequestInfo.body.(type) {
 		case *bytes.Buffer:

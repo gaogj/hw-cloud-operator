@@ -13,8 +13,8 @@ type VPC struct {
 
 type IAM struct {
 	GetUser UserGet
+	GetGroup GroupGet
 	CreateUser UserCreate
-	//GetGroup GroupGet
 	//GetUserByGroup UserByGroupGet
 }
 
@@ -26,6 +26,7 @@ func NewResources() *Resources {
 		},
 		IAM: &IAM{
 			GetUser: newUserGetFunc(),
+			GetGroup: newGroupGetFunc(),
 			CreateUser: newUserCreateFunc(),
 		},
 	}

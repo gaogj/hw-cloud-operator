@@ -81,6 +81,62 @@ func (ug UserGet) WithEnabled(Enabled string) func(*UserGetRequest) {
 	}
 }
 
+//GetGroup
+func newGroupGetFunc() GroupGet {
+	return func(endpoint string, o ...func(*GroupGetRequest)) (*http.Response, error) {
+		var r = GroupGetRequest{
+			Endpoint: endpoint,
+		}
+		for _, f := range o {
+			f(&r)
+		}
+		return r.Do()
+	}
+}
+
+type GroupGet func(endpoint string, o ...func(*GroupGetRequest)) (*http.Response, error)
+
+type GroupGetRequest struct {
+	ProjectId string
+	Endpoint string
+
+	GroupName string
+}
+
+func (ug GroupGetRequest) Do() (*http.Response, error) {
+
+	if Endpoints[ug.Endpoint].Host == "" {
+		return nil,errors.New("Can't find the Endpoint host")
+	}
+
+	RequestInfo := RequestInfo{
+		endpoint:Endpoints[ug.Endpoint].Host,
+		apiVersion: "v3",
+		category: "iam",
+		apiObject: "groups",
+		method: "GET",
+		scheme: "https",
+		params: make(map[string]string),
+	}
+
+	//params
+	if ug.GroupName != "" {
+		RequestInfo.params["name"] = ug.GroupName
+	}
+
+	req, err := newRequest(RequestInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 //GetUserInfo
 func newUserCreateFunc() UserCreate {
 	return func(endpoint, name, password string, o ...func(*UserCreateRequest)) (*http.Response, error) {
@@ -136,6 +192,9 @@ func (uc UserCreateRequest) Do() (*http.Response, error) {
 			"description": uc.Description,
 		},
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	body.Grow(len(bodyString))
 	body.Write(bodyString)
@@ -159,3 +218,4 @@ func (uc UserCreate) WithDescription(description string) func(*UserCreateRequest
 		ur.Description = description
 	}
 }
+
