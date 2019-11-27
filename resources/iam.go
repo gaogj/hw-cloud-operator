@@ -279,3 +279,58 @@ func (gau GroupAddUserRequest) Do() (*http.Response, error) {
 
 	return res, nil
 }
+
+func newListGroupsForUserFunc() ListGroupsForUser {
+	return func(endpoint, userid string, o ...func(*ListGroupsForUserRequest)) (*http.Response, error) {
+		var r = ListGroupsForUserRequest{
+			UserId: userid,
+			Endpoint: endpoint,
+		}
+		for _, f := range o {
+			f(&r)
+		}
+		return r.Do()
+	}
+}
+
+type ListGroupsForUser func(endpoint, userid string, o ...func(*ListGroupsForUserRequest)) (*http.Response, error)
+
+type ListGroupsForUserRequest struct {
+	ProjectId string
+	Endpoint string
+
+	UserId string
+}
+
+func (lgfu ListGroupsForUserRequest) Do() (*http.Response, error) {
+	if Endpoints[lgfu.Endpoint].Host == "" {
+		return nil,errors.New("Can't find the Endpoint host")
+	}
+
+	if lgfu.UserId == "" {
+		return nil,errors.New("UserId cannot be empty")
+	}
+
+	RequestInfo := RequestInfo{
+		resourceId: fmt.Sprintf("%s/groups",lgfu.UserId),
+		endpoint:Endpoints[lgfu.Endpoint].Host,
+		apiVersion: "v3",
+		category: "iam",
+		apiObject: "users",
+		method: "GET",
+		scheme: "https",
+		params: make(map[string]string),
+	}
+
+	req, err := newRequest(RequestInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}

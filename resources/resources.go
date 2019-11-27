@@ -16,6 +16,7 @@ type IAM struct {
 	GetGroup GroupGet
 	CreateUser UserCreate
 	AddUserToGroup GroupAddUser
+	ListGroupsForUser ListGroupsForUser
 	//GetUserByGroup UserByGroupGet
 }
 
@@ -30,6 +31,7 @@ func NewResources() *Resources {
 			GetGroup: newGroupGetFunc(),
 			CreateUser: newUserCreateFunc(),
 			AddUserToGroup: newGroupAddUserFunc(),
+			ListGroupsForUser: newListGroupsForUserFunc(),
 		},
 	}
 }
