@@ -18,7 +18,7 @@ type ECS struct {
 }
 
 type SCM struct {
-	ListSCM SCMList
+	ListCerts CertsList
 }
 
 type IAM struct {
@@ -47,7 +47,7 @@ func NewResources() *Resources {
 			GetECS: newEcsGetFunc(),
 		},
 		SCM: &SCM{
-			ListSCM: newSCMListFunc(),
+			ListCerts: newCertsListFunc(),
 		},
 	}
 }

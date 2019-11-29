@@ -6,9 +6,9 @@ import (
 )
 
 //UserGet
-func newSCMListFunc() SCMList {
-	return func(endpoint, orderStatus string, o ...func(*SCMListRequest)) (*http.Response, error) {
-		var r = SCMListRequest{
+func newCertsListFunc() CertsList {
+	return func(endpoint, orderStatus string, o ...func(*CertsListRequest)) (*http.Response, error) {
+		var r = CertsListRequest{
 			OrderStatus: orderStatus,
 			Endpoint: endpoint,
 		}
@@ -19,9 +19,9 @@ func newSCMListFunc() SCMList {
 	}
 }
 
-type SCMList func(endpoint, orderStatus string, o ...func(*SCMListRequest)) (*http.Response, error)
+type CertsList func(endpoint, orderStatus string, o ...func(*CertsListRequest)) (*http.Response, error)
 
-type SCMListRequest struct {
+type CertsListRequest struct {
 	ProjectId string
 	Endpoint string
 
@@ -30,7 +30,7 @@ type SCMListRequest struct {
 	Limit string
 }
 
-func (sl SCMListRequest) Do() (*http.Response, error) {
+func (sl CertsListRequest) Do() (*http.Response, error) {
 	if Endpoints[sl.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
@@ -71,20 +71,20 @@ func (sl SCMListRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (sl SCMList) WithOrderStatus(OrderStatus string) func(*SCMListRequest) {
-	return func(slr *SCMListRequest) {
+func (sl CertsList) WithOrderStatus(OrderStatus string) func(*CertsListRequest) {
+	return func(slr *CertsListRequest) {
 		slr.OrderStatus = OrderStatus
 	}
 }
 
-func (sl SCMList) WithMarker(Marker string) func(*SCMListRequest) {
-	return func(slr *SCMListRequest) {
+func (sl CertsList) WithMarker(Marker string) func(*CertsListRequest) {
+	return func(slr *CertsListRequest) {
 		slr.Marker = Marker
 	}
 }
 
-func (sl SCMList) WithLimit(Limit string) func(*SCMListRequest) {
-	return func(slr *SCMListRequest) {
+func (sl CertsList) WithLimit(Limit string) func(*CertsListRequest) {
+	return func(slr *CertsListRequest) {
 		slr.Limit = Limit
 	}
 }
