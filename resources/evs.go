@@ -6,10 +6,10 @@ import (
 )
 
 //EcsGet
-func newECSGetFunc() ECSGet {
-	return func(endpoint, serverid string, o ...func(*ECSGetRequest)) (*http.Response, error) {
-		var r = ECSGetRequest{
-			ServerId: serverid,
+func newEVSGetFunc() EVSGet {
+	return func(endpoint, volumeid string, o ...func(*EVSGetRequest)) (*http.Response, error) {
+		var r = EVSGetRequest{
+			VolumeId: volumeid,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -19,31 +19,31 @@ func newECSGetFunc() ECSGet {
 	}
 }
 
-type ECSGet func(endpoint, serverid string, o ...func(*ECSGetRequest)) (*http.Response, error)
+type EVSGet func(endpoint, volumeid string, o ...func(*EVSGetRequest)) (*http.Response, error)
 
-type ECSGetRequest struct {
+type EVSGetRequest struct {
 	ProjectId string
 	Endpoint string
 
-	ServerId string
+	VolumeId string
 }
 
-func (eg ECSGetRequest) Do() (*http.Response, error) {
+func (eg EVSGetRequest) Do() (*http.Response, error) {
 	if Endpoints[eg.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
-	if eg.ServerId == "" {
+	if eg.VolumeId == "" {
 		return nil,errors.New("Can't find the ecs server id")
 	}
 
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[eg.Endpoint].ProjectId,
-		resourceId: eg.ServerId,
+		resourceId: eg.VolumeId,
 		endpoint:Endpoints[eg.Endpoint].Host,
-		apiVersion: "v1",
-		category: "ecs",
-		apiObject: "cloudservers",
+		apiVersion: "v3",
+		category: "evs",
+		apiObject: "os-vendor-volumes",
 		method: "GET",
 		scheme: "https",
 		params: make(map[string]string),
@@ -63,9 +63,9 @@ func (eg ECSGetRequest) Do() (*http.Response, error) {
 }
 
 //EcsList
-func newECSListFunc() ECSList {
-	return func(endpoint, offset, limit string, o ...func(*ECSListRequest)) (*http.Response, error) {
-		var r = ECSListRequest{
+func newEVSListFunc() EVSList {
+	return func(endpoint, offset, limit string, o ...func(*EVSListRequest)) (*http.Response, error) {
+		var r = EVSListRequest{
 			Endpoint: endpoint,
 			Offset: offset,
 			Limit: limit,
@@ -77,9 +77,9 @@ func newECSListFunc() ECSList {
 	}
 }
 
-type ECSList func(endpoint, offset, limit string, o ...func(*ECSListRequest)) (*http.Response, error)
+type EVSList func(endpoint, offset, limit string, o ...func(*EVSListRequest)) (*http.Response, error)
 
-type ECSListRequest struct {
+type EVSListRequest struct {
 	ProjectId string
 	Endpoint string
 
@@ -87,7 +87,7 @@ type ECSListRequest struct {
 	Limit string
 }
 
-func (el ECSListRequest) Do() (*http.Response, error) {
+func (el EVSListRequest) Do() (*http.Response, error) {
 	if Endpoints[el.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
@@ -95,9 +95,9 @@ func (el ECSListRequest) Do() (*http.Response, error) {
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[el.Endpoint].ProjectId,
 		endpoint:Endpoints[el.Endpoint].Host,
-		apiVersion: "v1",
-		category: "ecs",
-		apiObject: "cloudservers/detail",
+		apiVersion: "v3",
+		category: "evs",
+		apiObject: "os-vendor-volumes/detail",
 		method: "GET",
 		scheme: "https",
 		params: make(map[string]string),

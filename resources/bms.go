@@ -5,10 +5,10 @@ import (
 	"net/http"
 )
 
-//EcsGet
-func newECSGetFunc() ECSGet {
-	return func(endpoint, serverid string, o ...func(*ECSGetRequest)) (*http.Response, error) {
-		var r = ECSGetRequest{
+//BMSGet
+func newBMSGetFunc() BMSGet {
+	return func(endpoint, serverid string, o ...func(*BMSGetRequest)) (*http.Response, error) {
+		var r = BMSGetRequest{
 			ServerId: serverid,
 			Endpoint: endpoint,
 		}
@@ -19,16 +19,16 @@ func newECSGetFunc() ECSGet {
 	}
 }
 
-type ECSGet func(endpoint, serverid string, o ...func(*ECSGetRequest)) (*http.Response, error)
+type BMSGet func(endpoint, serverid string, o ...func(*BMSGetRequest)) (*http.Response, error)
 
-type ECSGetRequest struct {
+type BMSGetRequest struct {
 	ProjectId string
 	Endpoint string
 
 	ServerId string
 }
 
-func (eg ECSGetRequest) Do() (*http.Response, error) {
+func (eg BMSGetRequest) Do() (*http.Response, error) {
 	if Endpoints[eg.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
@@ -42,8 +42,8 @@ func (eg ECSGetRequest) Do() (*http.Response, error) {
 		resourceId: eg.ServerId,
 		endpoint:Endpoints[eg.Endpoint].Host,
 		apiVersion: "v1",
-		category: "ecs",
-		apiObject: "cloudservers",
+		category: "bms",
+		apiObject: "baremetalservers",
 		method: "GET",
 		scheme: "https",
 		params: make(map[string]string),
@@ -62,10 +62,10 @@ func (eg ECSGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-//EcsList
-func newECSListFunc() ECSList {
-	return func(endpoint, offset, limit string, o ...func(*ECSListRequest)) (*http.Response, error) {
-		var r = ECSListRequest{
+//BMSList
+func newBMSListFunc() BMSList {
+	return func(endpoint, offset, limit string, o ...func(*BMSListRequest)) (*http.Response, error) {
+		var r = BMSListRequest{
 			Endpoint: endpoint,
 			Offset: offset,
 			Limit: limit,
@@ -77,9 +77,9 @@ func newECSListFunc() ECSList {
 	}
 }
 
-type ECSList func(endpoint, offset, limit string, o ...func(*ECSListRequest)) (*http.Response, error)
+type BMSList func(endpoint, offset, limit string, o ...func(*BMSListRequest)) (*http.Response, error)
 
-type ECSListRequest struct {
+type BMSListRequest struct {
 	ProjectId string
 	Endpoint string
 
@@ -87,7 +87,7 @@ type ECSListRequest struct {
 	Limit string
 }
 
-func (el ECSListRequest) Do() (*http.Response, error) {
+func (el BMSListRequest) Do() (*http.Response, error) {
 	if Endpoints[el.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
@@ -96,8 +96,8 @@ func (el ECSListRequest) Do() (*http.Response, error) {
 		projectId: Endpoints[el.Endpoint].ProjectId,
 		endpoint:Endpoints[el.Endpoint].Host,
 		apiVersion: "v1",
-		category: "ecs",
-		apiObject: "cloudservers/detail",
+		category: "bms",
+		apiObject: "baremetalservers/detail",
 		method: "GET",
 		scheme: "https",
 		params: make(map[string]string),

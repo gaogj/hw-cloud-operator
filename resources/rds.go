@@ -6,10 +6,10 @@ import (
 )
 
 //EcsGet
-func newECSGetFunc() ECSGet {
-	return func(endpoint, serverid string, o ...func(*ECSGetRequest)) (*http.Response, error) {
-		var r = ECSGetRequest{
-			ServerId: serverid,
+func newRDSGetFunc() RDSGet {
+	return func(endpoint, instanceid string, o ...func(*RDSGetRequest)) (*http.Response, error) {
+		var r = RDSGetRequest{
+			InstanceId: instanceid,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -19,35 +19,37 @@ func newECSGetFunc() ECSGet {
 	}
 }
 
-type ECSGet func(endpoint, serverid string, o ...func(*ECSGetRequest)) (*http.Response, error)
+type RDSGet func(endpoint, serverid string, o ...func(*RDSGetRequest)) (*http.Response, error)
 
-type ECSGetRequest struct {
+type RDSGetRequest struct {
 	ProjectId string
 	Endpoint string
 
-	ServerId string
+	InstanceId string
 }
 
-func (eg ECSGetRequest) Do() (*http.Response, error) {
+func (eg RDSGetRequest) Do() (*http.Response, error) {
 	if Endpoints[eg.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
-	if eg.ServerId == "" {
-		return nil,errors.New("Can't find the ecs server id")
+	if eg.InstanceId == "" {
+		return nil,errors.New("Can't find the ecs instance id")
 	}
 
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[eg.Endpoint].ProjectId,
-		resourceId: eg.ServerId,
+		//resourceId: eg.InstanceId,
 		endpoint:Endpoints[eg.Endpoint].Host,
-		apiVersion: "v1",
-		category: "ecs",
-		apiObject: "cloudservers",
+		apiVersion: "v3",
+		category: "rds",
+		apiObject: "instances",
 		method: "GET",
 		scheme: "https",
 		params: make(map[string]string),
 	}
+
+	RequestInfo.params["id"] = eg.InstanceId
 
 	req, err := newRequest(RequestInfo)
 	if err != nil {
@@ -63,9 +65,9 @@ func (eg ECSGetRequest) Do() (*http.Response, error) {
 }
 
 //EcsList
-func newECSListFunc() ECSList {
-	return func(endpoint, offset, limit string, o ...func(*ECSListRequest)) (*http.Response, error) {
-		var r = ECSListRequest{
+func newRDSListFunc() RDSList {
+	return func(endpoint, offset, limit string, o ...func(*RDSListRequest)) (*http.Response, error) {
+		var r = RDSListRequest{
 			Endpoint: endpoint,
 			Offset: offset,
 			Limit: limit,
@@ -77,9 +79,9 @@ func newECSListFunc() ECSList {
 	}
 }
 
-type ECSList func(endpoint, offset, limit string, o ...func(*ECSListRequest)) (*http.Response, error)
+type RDSList func(endpoint, offset, limit string, o ...func(*RDSListRequest)) (*http.Response, error)
 
-type ECSListRequest struct {
+type RDSListRequest struct {
 	ProjectId string
 	Endpoint string
 
@@ -87,7 +89,7 @@ type ECSListRequest struct {
 	Limit string
 }
 
-func (el ECSListRequest) Do() (*http.Response, error) {
+func (el RDSListRequest) Do() (*http.Response, error) {
 	if Endpoints[el.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
@@ -95,9 +97,9 @@ func (el ECSListRequest) Do() (*http.Response, error) {
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[el.Endpoint].ProjectId,
 		endpoint:Endpoints[el.Endpoint].Host,
-		apiVersion: "v1",
-		category: "ecs",
-		apiObject: "cloudservers/detail",
+		apiVersion: "v3",
+		category: "rds",
+		apiObject: "instances",
 		method: "GET",
 		scheme: "https",
 		params: make(map[string]string),

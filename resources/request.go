@@ -2,6 +2,7 @@ package Api
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/gaogj/hw-cloud-operator/utils"
 	"github.com/pkg/errors"
 	"io"
@@ -140,6 +141,6 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 	}
 
 	Sign.Sign(r)
-
+	fmt.Println(r)
 	return r, nil
 }
