@@ -38,7 +38,7 @@ func (vr VPCGetRequest) Do() (*http.Response, error) {
 
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[vr.Endpoint].ProjectId,
-		endpoint:Endpoints[vr.Endpoint].Host,
+		endpoint: Endpoints[vr.Endpoint].Host,
 		apiVersion: "v1",
 		category: "vpc",
 		apiObject: "vpcs",

@@ -45,6 +45,7 @@ func (sl CertsListRequest) Do() (*http.Response, error) {
 		scheme: "https",
 		params: make(map[string]string),
 	}
+
 	//params
 	if sl.OrderStatus != "" {
 		RequestInfo.params["order_status"] = sl.OrderStatus

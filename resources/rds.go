@@ -7,9 +7,8 @@ import (
 
 //EcsGet
 func newRDSGetFunc() RDSGet {
-	return func(endpoint, instanceid string, o ...func(*RDSGetRequest)) (*http.Response, error) {
+	return func(endpoint string, o ...func(*RDSGetRequest)) (*http.Response, error) {
 		var r = RDSGetRequest{
-			InstanceId: instanceid,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -19,13 +18,16 @@ func newRDSGetFunc() RDSGet {
 	}
 }
 
-type RDSGet func(endpoint, serverid string, o ...func(*RDSGetRequest)) (*http.Response, error)
+type RDSGet func(endpoint string, o ...func(*RDSGetRequest)) (*http.Response, error)
 
 type RDSGetRequest struct {
 	ProjectId string
 	Endpoint string
 
-	InstanceId string
+	ResourceId string
+
+	Offset string
+	Limit string
 }
 
 func (eg RDSGetRequest) Do() (*http.Response, error) {
@@ -33,13 +35,8 @@ func (eg RDSGetRequest) Do() (*http.Response, error) {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
-	if eg.InstanceId == "" {
-		return nil,errors.New("Can't find the ecs instance id")
-	}
-
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[eg.Endpoint].ProjectId,
-		//resourceId: eg.InstanceId,
 		endpoint:Endpoints[eg.Endpoint].Host,
 		apiVersion: "v3",
 		category: "rds",
@@ -49,7 +46,18 @@ func (eg RDSGetRequest) Do() (*http.Response, error) {
 		params: make(map[string]string),
 	}
 
-	RequestInfo.params["id"] = eg.InstanceId
+	//params
+	if eg.ResourceId != "" {
+		RequestInfo.params["id"] = eg.ResourceId
+	}
+
+	if eg.Offset != "" {
+		RequestInfo.params["marker"] = eg.Offset
+	}
+
+	if eg.Limit != "" {
+		RequestInfo.params["limit"] = eg.Limit
+	}
 
 	req, err := newRequest(RequestInfo)
 	if err != nil {
@@ -64,59 +72,20 @@ func (eg RDSGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-//EcsList
-func newRDSListFunc() RDSList {
-	return func(endpoint, offset, limit string, o ...func(*RDSListRequest)) (*http.Response, error) {
-		var r = RDSListRequest{
-			Endpoint: endpoint,
-			Offset: offset,
-			Limit: limit,
-		}
-		for _, f := range o {
-			f(&r)
-		}
-		return r.Do()
+func (dg RDSGet) WithResourceId(ResourceId string) func(*RDSGetRequest) {
+	return func(dgr *RDSGetRequest) {
+		dgr.ResourceId = ResourceId
 	}
 }
 
-type RDSList func(endpoint, offset, limit string, o ...func(*RDSListRequest)) (*http.Response, error)
-
-type RDSListRequest struct {
-	ProjectId string
-	Endpoint string
-
-	Offset string
-	Limit string
+func (dg RDSGet) WithMarker(Marker string) func(*RDSGetRequest) {
+	return func(dgr *RDSGetRequest) {
+		dgr.Offset = Marker
+	}
 }
 
-func (el RDSListRequest) Do() (*http.Response, error) {
-	if Endpoints[el.Endpoint].Host == "" {
-		return nil,errors.New("Can't find the Endpoint host")
+func (dg RDSGet) WithLimit(Limit string) func(*RDSGetRequest) {
+	return func(dgr *RDSGetRequest) {
+		dgr.Limit = Limit
 	}
-
-	RequestInfo := RequestInfo{
-		projectId: Endpoints[el.Endpoint].ProjectId,
-		endpoint:Endpoints[el.Endpoint].Host,
-		apiVersion: "v3",
-		category: "rds",
-		apiObject: "instances",
-		method: "GET",
-		scheme: "https",
-		params: make(map[string]string),
-	}
-
-	RequestInfo.params["offset"] = el.Offset
-	RequestInfo.params["limit"] = el.Limit
-
-	req, err := newRequest(RequestInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }

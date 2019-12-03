@@ -7,9 +7,9 @@ import (
 
 //BMSGet
 func newBMSGetFunc() BMSGet {
-	return func(endpoint, serverid string, o ...func(*BMSGetRequest)) (*http.Response, error) {
+	return func(endpoint string, o ...func(*BMSGetRequest)) (*http.Response, error) {
 		var r = BMSGetRequest{
-			ServerId: serverid,
+			ResourceId: "detail",
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -19,28 +19,27 @@ func newBMSGetFunc() BMSGet {
 	}
 }
 
-type BMSGet func(endpoint, serverid string, o ...func(*BMSGetRequest)) (*http.Response, error)
+type BMSGet func(endpoint string, o ...func(*BMSGetRequest)) (*http.Response, error)
 
 type BMSGetRequest struct {
 	ProjectId string
 	Endpoint string
 
-	ServerId string
+	ResourceId string
+
+	Limit string
+	Offset string
 }
 
-func (eg BMSGetRequest) Do() (*http.Response, error) {
-	if Endpoints[eg.Endpoint].Host == "" {
+func (bg BMSGetRequest) Do() (*http.Response, error) {
+	if Endpoints[bg.Endpoint].Host == "" {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
-	if eg.ServerId == "" {
-		return nil,errors.New("Can't find the ecs server id")
-	}
-
 	RequestInfo := RequestInfo{
-		projectId: Endpoints[eg.Endpoint].ProjectId,
-		resourceId: eg.ServerId,
-		endpoint:Endpoints[eg.Endpoint].Host,
+		projectId: Endpoints[bg.Endpoint].ProjectId,
+		resourceId: bg.ResourceId,
+		endpoint: Endpoints[bg.Endpoint].Host,
 		apiVersion: "v1",
 		category: "bms",
 		apiObject: "baremetalservers",
@@ -49,6 +48,15 @@ func (eg BMSGetRequest) Do() (*http.Response, error) {
 		params: make(map[string]string),
 	}
 
+	//params
+	if bg.Offset != "" {
+		RequestInfo.params["marker"] = bg.Offset
+	}
+
+	if bg.Limit != "" {
+		RequestInfo.params["limit"] = bg.Limit
+	}
+
 	req, err := newRequest(RequestInfo)
 	if err != nil {
 		return nil, err
@@ -62,59 +70,20 @@ func (eg BMSGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-//BMSList
-func newBMSListFunc() BMSList {
-	return func(endpoint, offset, limit string, o ...func(*BMSListRequest)) (*http.Response, error) {
-		var r = BMSListRequest{
-			Endpoint: endpoint,
-			Offset: offset,
-			Limit: limit,
-		}
-		for _, f := range o {
-			f(&r)
-		}
-		return r.Do()
+func (bg BMSGet) WithResourceId(ResourceId string) func(*BMSGetRequest) {
+	return func(bgr *BMSGetRequest) {
+		bgr.ResourceId = ResourceId
 	}
 }
 
-type BMSList func(endpoint, offset, limit string, o ...func(*BMSListRequest)) (*http.Response, error)
-
-type BMSListRequest struct {
-	ProjectId string
-	Endpoint string
-
-	Offset string
-	Limit string
+func (bg BMSGet) WithMarker(Marker string) func(*BMSGetRequest) {
+	return func(bgr *BMSGetRequest) {
+		bgr.Offset = Marker
+	}
 }
 
-func (el BMSListRequest) Do() (*http.Response, error) {
-	if Endpoints[el.Endpoint].Host == "" {
-		return nil,errors.New("Can't find the Endpoint host")
+func (bg BMSGet) WithLimit(Limit string) func(*BMSGetRequest) {
+	return func(bgr *BMSGetRequest) {
+		bgr.Limit = Limit
 	}
-
-	RequestInfo := RequestInfo{
-		projectId: Endpoints[el.Endpoint].ProjectId,
-		endpoint:Endpoints[el.Endpoint].Host,
-		apiVersion: "v1",
-		category: "bms",
-		apiObject: "baremetalservers/detail",
-		method: "GET",
-		scheme: "https",
-		params: make(map[string]string),
-	}
-
-	RequestInfo.params["offset"] = el.Offset
-	RequestInfo.params["limit"] = el.Limit
-
-	req, err := newRequest(RequestInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }

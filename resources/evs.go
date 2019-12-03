@@ -7,9 +7,9 @@ import (
 
 //EcsGet
 func newEVSGetFunc() EVSGet {
-	return func(endpoint, volumeid string, o ...func(*EVSGetRequest)) (*http.Response, error) {
+	return func(endpoint string, o ...func(*EVSGetRequest)) (*http.Response, error) {
 		var r = EVSGetRequest{
-			VolumeId: volumeid,
+			ResourceId: "detail",
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -19,13 +19,16 @@ func newEVSGetFunc() EVSGet {
 	}
 }
 
-type EVSGet func(endpoint, volumeid string, o ...func(*EVSGetRequest)) (*http.Response, error)
+type EVSGet func(endpoint string, o ...func(*EVSGetRequest)) (*http.Response, error)
 
 type EVSGetRequest struct {
 	ProjectId string
 	Endpoint string
 
-	VolumeId string
+	ResourceId string
+
+	Offset string
+	Limit string
 }
 
 func (eg EVSGetRequest) Do() (*http.Response, error) {
@@ -33,13 +36,9 @@ func (eg EVSGetRequest) Do() (*http.Response, error) {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
-	if eg.VolumeId == "" {
-		return nil,errors.New("Can't find the ecs server id")
-	}
-
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[eg.Endpoint].ProjectId,
-		resourceId: eg.VolumeId,
+		resourceId: eg.ResourceId,
 		endpoint:Endpoints[eg.Endpoint].Host,
 		apiVersion: "v3",
 		category: "evs",
@@ -49,6 +48,15 @@ func (eg EVSGetRequest) Do() (*http.Response, error) {
 		params: make(map[string]string),
 	}
 
+	//params
+	if eg.Offset != "" {
+		RequestInfo.params["marker"] = eg.Offset
+	}
+
+	if eg.Limit != "" {
+		RequestInfo.params["limit"] = eg.Limit
+	}
+
 	req, err := newRequest(RequestInfo)
 	if err != nil {
 		return nil, err
@@ -62,59 +70,20 @@ func (eg EVSGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-//EcsList
-func newEVSListFunc() EVSList {
-	return func(endpoint, offset, limit string, o ...func(*EVSListRequest)) (*http.Response, error) {
-		var r = EVSListRequest{
-			Endpoint: endpoint,
-			Offset: offset,
-			Limit: limit,
-		}
-		for _, f := range o {
-			f(&r)
-		}
-		return r.Do()
+func (eg EVSGet) WithResourceId(ResourceId string) func(*EVSGetRequest) {
+	return func(egr *EVSGetRequest) {
+		egr.ResourceId = ResourceId
 	}
 }
 
-type EVSList func(endpoint, offset, limit string, o ...func(*EVSListRequest)) (*http.Response, error)
-
-type EVSListRequest struct {
-	ProjectId string
-	Endpoint string
-
-	Offset string
-	Limit string
+func (eg EVSGet) WithMarker(Marker string) func(*EVSGetRequest) {
+	return func(egr *EVSGetRequest) {
+		egr.Offset = Marker
+	}
 }
 
-func (el EVSListRequest) Do() (*http.Response, error) {
-	if Endpoints[el.Endpoint].Host == "" {
-		return nil,errors.New("Can't find the Endpoint host")
+func (eg EVSGet) WithLimit(Limit string) func(*EVSGetRequest) {
+	return func(egr *EVSGetRequest) {
+		egr.Limit = Limit
 	}
-
-	RequestInfo := RequestInfo{
-		projectId: Endpoints[el.Endpoint].ProjectId,
-		endpoint:Endpoints[el.Endpoint].Host,
-		apiVersion: "v3",
-		category: "evs",
-		apiObject: "os-vendor-volumes/detail",
-		method: "GET",
-		scheme: "https",
-		params: make(map[string]string),
-	}
-
-	RequestInfo.params["offset"] = el.Offset
-	RequestInfo.params["limit"] = el.Limit
-
-	req, err := newRequest(RequestInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }

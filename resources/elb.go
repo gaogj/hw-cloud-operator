@@ -7,9 +7,8 @@ import (
 
 //EcsGet
 func newELBGetFunc() ELBGet {
-	return func(endpoint, loadbalancerid string, o ...func(*ELBGetRequest)) (*http.Response, error) {
+	return func(endpoint string, o ...func(*ELBGetRequest)) (*http.Response, error) {
 		var r = ELBGetRequest{
-			LoadbalancerId: loadbalancerid,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -19,13 +18,13 @@ func newELBGetFunc() ELBGet {
 	}
 }
 
-type ELBGet func(endpoint, loadbalancerid string, o ...func(*ELBGetRequest)) (*http.Response, error)
+type ELBGet func(endpoint string, o ...func(*ELBGetRequest)) (*http.Response, error)
 
 type ELBGetRequest struct {
 	ProjectId string
 	Endpoint string
 
-	LoadbalancerId string
+	ResourceId string
 }
 
 func (eg ELBGetRequest) Do() (*http.Response, error) {
@@ -33,13 +32,8 @@ func (eg ELBGetRequest) Do() (*http.Response, error) {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
-	if eg.LoadbalancerId == "" {
-		return nil,errors.New("Can't find the ecs server id")
-	}
-
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[eg.Endpoint].ProjectId,
-		resourceId: eg.LoadbalancerId,
 		endpoint:Endpoints[eg.Endpoint].Host,
 		apiVersion: "v1.0",
 		category: "elb",
@@ -62,68 +56,16 @@ func (eg ELBGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-//EcsList
-func newELBListFunc() ELBList {
-	return func(endpoint, offset, limit string, o ...func(*ELBListRequest)) (*http.Response, error) {
-		var r = ELBListRequest{
-			Endpoint: endpoint,
-			Offset: offset,
-			Limit: limit,
-		}
-		for _, f := range o {
-			f(&r)
-		}
-		return r.Do()
+func (eg ELBGet) WithResourceId(ResourceId string) func(*ELBGetRequest) {
+	return func(egr *ELBGetRequest) {
+		egr.ResourceId = ResourceId
 	}
-}
-
-type ELBList func(endpoint, offset, limit string, o ...func(*ELBListRequest)) (*http.Response, error)
-
-type ELBListRequest struct {
-	ProjectId string
-	Endpoint string
-
-	Offset string
-	Limit string
-}
-
-func (el ELBListRequest) Do() (*http.Response, error) {
-	if Endpoints[el.Endpoint].Host == "" {
-		return nil,errors.New("Can't find the Endpoint host")
-	}
-
-	RequestInfo := RequestInfo{
-		projectId: Endpoints[el.Endpoint].ProjectId,
-		endpoint:Endpoints[el.Endpoint].Host,
-		apiVersion: "v1.0",
-		category: "elb",
-		apiObject: "elbaas/loadbalancers",
-		method: "GET",
-		scheme: "https",
-		params: make(map[string]string),
-	}
-
-	RequestInfo.params["offset"] = el.Offset
-	RequestInfo.params["limit"] = el.Limit
-
-	req, err := newRequest(RequestInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }
 
 //listeners
 func newListenerGetFunc() ListenerGet {
-	return func(endpoint, listenerid string, o ...func(*ListenerGetRequest)) (*http.Response, error) {
+	return func(endpoint string, o ...func(*ListenerGetRequest)) (*http.Response, error) {
 		var r = ListenerGetRequest{
-			ListenerId: listenerid,
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -133,13 +75,13 @@ func newListenerGetFunc() ListenerGet {
 	}
 }
 
-type ListenerGet func(endpoint, loadbalancerid string, o ...func(*ListenerGetRequest)) (*http.Response, error)
+type ListenerGet func(endpoint string, o ...func(*ListenerGetRequest)) (*http.Response, error)
 
 type ListenerGetRequest struct {
 	ProjectId string
 	Endpoint string
 
-	ListenerId string
+	ResourceId string
 }
 
 func (eg ListenerGetRequest) Do() (*http.Response, error) {
@@ -147,17 +89,13 @@ func (eg ListenerGetRequest) Do() (*http.Response, error) {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
-	if eg.ListenerId == "" {
-		return nil,errors.New("Can't find the ecs server id")
-	}
-
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[eg.Endpoint].ProjectId,
-		resourceId: eg.ListenerId,
+		resourceId: eg.ResourceId,
 		endpoint:Endpoints[eg.Endpoint].Host,
-		apiVersion: "v2.0",
+		apiVersion: "v1.0",
 		category: "elb",
-		apiObject: "lbaas/loadbalancers",
+		apiObject: "elbaas/listeners",
 		method: "GET",
 		scheme: "https",
 		params: make(map[string]string),
@@ -176,61 +114,10 @@ func (eg ListenerGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-//listenersList
-func newListenerListFunc() ListenerList {
-	return func(endpoint, offset, limit string, o ...func(*ListenerListRequest)) (*http.Response, error) {
-		var r = ListenerListRequest{
-			Endpoint: endpoint,
-			Offset: offset,
-			Limit: limit,
-		}
-		for _, f := range o {
-			f(&r)
-		}
-		return r.Do()
+func (lg ListenerGet) WithResourceId(ResourceId string) func(*ListenerGetRequest) {
+	return func(lgr *ListenerGetRequest) {
+		lgr.ResourceId = ResourceId
 	}
-}
-
-type ListenerList func(endpoint, offset, limit string, o ...func(*ListenerListRequest)) (*http.Response, error)
-
-type ListenerListRequest struct {
-	ProjectId string
-	Endpoint string
-
-	Offset string
-	Limit string
-}
-
-func (el ListenerListRequest) Do() (*http.Response, error) {
-	if Endpoints[el.Endpoint].Host == "" {
-		return nil,errors.New("Can't find the Endpoint host")
-	}
-
-	RequestInfo := RequestInfo{
-		projectId: Endpoints[el.Endpoint].ProjectId,
-		endpoint:Endpoints[el.Endpoint].Host,
-		apiVersion: "v2.0",
-		category: "elb",
-		apiObject: "lbaas/listeners",
-		method: "GET",
-		scheme: "https",
-		params: make(map[string]string),
-	}
-
-	RequestInfo.params["offset"] = el.Offset
-	RequestInfo.params["limit"] = el.Limit
-
-	req, err := newRequest(RequestInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }
 
 //pools

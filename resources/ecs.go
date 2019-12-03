@@ -7,9 +7,9 @@ import (
 
 //EcsGet
 func newECSGetFunc() ECSGet {
-	return func(endpoint, serverid string, o ...func(*ECSGetRequest)) (*http.Response, error) {
+	return func(endpoint string, o ...func(*ECSGetRequest)) (*http.Response, error) {
 		var r = ECSGetRequest{
-			ServerId: serverid,
+			ResourceId: "detail",
 			Endpoint: endpoint,
 		}
 		for _, f := range o {
@@ -19,13 +19,16 @@ func newECSGetFunc() ECSGet {
 	}
 }
 
-type ECSGet func(endpoint, serverid string, o ...func(*ECSGetRequest)) (*http.Response, error)
+type ECSGet func(endpoint string, o ...func(*ECSGetRequest)) (*http.Response, error)
 
 type ECSGetRequest struct {
 	ProjectId string
 	Endpoint string
 
-	ServerId string
+	ResourceId string
+
+	Limit string
+	Offset string
 }
 
 func (eg ECSGetRequest) Do() (*http.Response, error) {
@@ -33,13 +36,9 @@ func (eg ECSGetRequest) Do() (*http.Response, error) {
 		return nil,errors.New("Can't find the Endpoint host")
 	}
 
-	if eg.ServerId == "" {
-		return nil,errors.New("Can't find the ecs server id")
-	}
-
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[eg.Endpoint].ProjectId,
-		resourceId: eg.ServerId,
+		resourceId: eg.ResourceId,
 		endpoint:Endpoints[eg.Endpoint].Host,
 		apiVersion: "v1",
 		category: "ecs",
@@ -49,6 +48,15 @@ func (eg ECSGetRequest) Do() (*http.Response, error) {
 		params: make(map[string]string),
 	}
 
+	//params
+	if eg.Offset != "" {
+		RequestInfo.params["marker"] = eg.Offset
+	}
+
+	if eg.Limit != "" {
+		RequestInfo.params["limit"] = eg.Limit
+	}
+
 	req, err := newRequest(RequestInfo)
 	if err != nil {
 		return nil, err
@@ -62,59 +70,20 @@ func (eg ECSGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-//EcsList
-func newECSListFunc() ECSList {
-	return func(endpoint, offset, limit string, o ...func(*ECSListRequest)) (*http.Response, error) {
-		var r = ECSListRequest{
-			Endpoint: endpoint,
-			Offset: offset,
-			Limit: limit,
-		}
-		for _, f := range o {
-			f(&r)
-		}
-		return r.Do()
+func (eg ECSGet) WithResourceId(ResourceId string) func(*ECSGetRequest) {
+	return func(egr *ECSGetRequest) {
+		egr.ResourceId = ResourceId
 	}
 }
 
-type ECSList func(endpoint, offset, limit string, o ...func(*ECSListRequest)) (*http.Response, error)
-
-type ECSListRequest struct {
-	ProjectId string
-	Endpoint string
-
-	Offset string
-	Limit string
+func (eg ECSGet) WithMarker(Marker string) func(*ECSGetRequest) {
+	return func(egr *ECSGetRequest) {
+		egr.Offset = Marker
+	}
 }
 
-func (el ECSListRequest) Do() (*http.Response, error) {
-	if Endpoints[el.Endpoint].Host == "" {
-		return nil,errors.New("Can't find the Endpoint host")
+func (eg ECSGet) WithLimit(Limit string) func(*ECSGetRequest) {
+	return func(egr *ECSGetRequest) {
+		egr.Limit = Limit
 	}
-
-	RequestInfo := RequestInfo{
-		projectId: Endpoints[el.Endpoint].ProjectId,
-		endpoint:Endpoints[el.Endpoint].Host,
-		apiVersion: "v1",
-		category: "ecs",
-		apiObject: "cloudservers/detail",
-		method: "GET",
-		scheme: "https",
-		params: make(map[string]string),
-	}
-
-	RequestInfo.params["offset"] = el.Offset
-	RequestInfo.params["limit"] = el.Limit
-
-	req, err := newRequest(RequestInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }
