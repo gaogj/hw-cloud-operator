@@ -10,6 +10,7 @@ type Resources struct {
 	DCS *DCS
 	RDS *RDS
 	ELB *ELB
+	DMS *DMS
 }
 
 type VPC struct {
@@ -61,6 +62,10 @@ type IAM struct {
 	AddUserToGroup GroupAddUser
 	ListGroupsForUser ListGroupsForUser
 	//GetUserByGroup UserByGroupGet
+}
+
+type DMS struct {
+	CreatingConsumer
 }
 
 func NewResources() *Resources {

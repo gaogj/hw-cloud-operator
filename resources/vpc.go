@@ -25,7 +25,7 @@ type VPCGetRequest struct {
 
 	Marker string
 	Limit string
-	ResourceId string
+	ResourceID string
 }
 
 func (vr VPCGetRequest) Do() (*http.Response, error) {
@@ -38,7 +38,7 @@ func (vr VPCGetRequest) Do() (*http.Response, error) {
 
 	RequestInfo := RequestInfo{
 		projectId: Endpoints[vr.Endpoint].ProjectId,
-		resourceId: vr.ResourceId,
+		resourceId: vr.ResourceID,
 		endpoint: Endpoints[vr.Endpoint].Host,
 		apiVersion: "v1",
 		category: "vpc",
@@ -67,9 +67,9 @@ func (vr VPCGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (vg VPCGet) WithResourceId(ResourceId string) func(*VPCGetRequest) {
+func (vg VPCGet) WithResourceID(ResourceId string) func(*VPCGetRequest) {
 	return func(vr *VPCGetRequest) {
-		vr.ResourceId = ResourceId
+		vr.ResourceID = ResourceId
 	}
 }
 
@@ -105,7 +105,7 @@ type SubnetGetRequest struct {
 
 	Marker string
 	Limit string
-	VPCId string
+	VPCID string
 }
 
 func (sr SubnetGetRequest) Do() (*http.Response, error){
@@ -146,9 +146,9 @@ func (sr SubnetGetRequest) Do() (*http.Response, error){
 	return res, nil
 }
 
-func (sg SubnetGet) WithVPCId(VPCId string) func(*SubnetGetRequest) {
+func (sg SubnetGet) WithVPCID(VPCID string) func(*SubnetGetRequest) {
 	return func(sr *SubnetGetRequest) {
-		sr.VPCId = VPCId
+		sr.VPCID = VPCID
 	}
 }
 
@@ -168,8 +168,66 @@ func (sg SubnetGet) WithLimit(Limit string) func(*SubnetGetRequest) {
 type PublicipGet func(endpoint string, o ...func(*PublicipGetRequest)) (*http.Response, error)
 
 type PublicipGetRequest struct {
+	Endpoint string
+
 	Marker string
-	Limit int
-	ResourceId string
+	Limit string
+	ResourceID string
 	VPCId string
+}
+
+func (pr PublicipGetRequest) Do() (*http.Response, error){
+	if Endpoints[pr.Endpoint].ProjectId == "" {
+		return nil,errors.New("Can't find the Endpoint projectId")
+	}
+	if Endpoints[pr.Endpoint].Host == "" {
+		return nil,errors.New("Can't find the Endpoint host")
+	}
+
+	RequestInfo := RequestInfo{
+		projectId: Endpoints[pr.Endpoint].ProjectId,
+		endpoint:Endpoints[pr.Endpoint].Host,
+		apiVersion: "v1",
+		category: "vpc",
+		apiObject: "publicips",
+		method: "GET",
+		scheme: "https",
+		params: make(map[string]string),
+	}
+
+	//params
+	if pr.Marker != "" {
+		RequestInfo.params["marker"] = pr.Marker
+	}
+
+	if pr.Limit != "" {
+		RequestInfo.params["limit"] = pr.Limit
+	}
+
+	req, _ := newRequest(RequestInfo)
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (pr PublicipGet) WithPublicipID(PublicipID string) func(*PublicipGetRequest) {
+	return func(sr *PublicipGetRequest) {
+		sr.ResourceID = PublicipID
+	}
+}
+
+func (pr PublicipGet) WithMarker(Marker string) func(*PublicipGetRequest) {
+	return func(sr *PublicipGetRequest) {
+		sr.Marker = Marker
+	}
+}
+
+func (pr PublicipGet) WithLimit(Limit string) func(*PublicipGetRequest) {
+	return func(sr *PublicipGetRequest) {
+		sr.Limit = Limit
+	}
 }

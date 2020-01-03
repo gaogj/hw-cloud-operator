@@ -139,7 +139,9 @@ func newRequest(RequestInfo RequestInfo) (*http.Request, error) {
 		r.Header.Add("X-Domain-Id", Sign.Id)
 	}
 
-	Sign.Sign(r)
+	if err := Sign.Sign(r); err != nil {
+		return nil, err
+	}
 
 	return r, nil
 }
