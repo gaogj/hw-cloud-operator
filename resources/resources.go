@@ -10,7 +10,7 @@ type Resources struct {
 	DCS *DCS
 	RDS *RDS
 	ELB *ELB
-	DMS *DMS
+	//DMS *DMS
 }
 
 type VPC struct {
@@ -64,9 +64,9 @@ type IAM struct {
 	//GetUserByGroup UserByGroupGet
 }
 
-type DMS struct {
-	CreatingConsumer
-}
+//type DMS struct {
+//	CreatingConsumer
+//}
 
 func NewResources() *Resources {
 	return &Resources{
