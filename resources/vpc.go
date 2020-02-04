@@ -146,7 +146,7 @@ func (sr SubnetGetRequest) Do() (*http.Response, error){
 	return res, nil
 }
 
-func (sg SubnetGet) WithVPCID(VPCID string) func(*SubnetGetRequest) {
+func (sg SubnetGet) WithResourceID(VPCID string) func(*SubnetGetRequest) {
 	return func(sr *SubnetGetRequest) {
 		sr.VPCID = VPCID
 	}
@@ -164,6 +164,18 @@ func (sg SubnetGet) WithLimit(Limit string) func(*SubnetGetRequest) {
 	}
 }
 
+//PublicipGet
+func newPublicipGetFunc() PublicipGet {
+	return func(endpoint string, o ...func(*PublicipGetRequest)) (*http.Response, error) {
+		var r = PublicipGetRequest{
+			Endpoint: endpoint,
+		}
+		for _, f := range o {
+			f(&r)
+		}
+		return r.Do()
+	}
+}
 
 type PublicipGet func(endpoint string, o ...func(*PublicipGetRequest)) (*http.Response, error)
 
@@ -214,7 +226,7 @@ func (pr PublicipGetRequest) Do() (*http.Response, error){
 	return res, nil
 }
 
-func (pr PublicipGet) WithPublicipID(PublicipID string) func(*PublicipGetRequest) {
+func (pr PublicipGet) WithResourceID(PublicipID string) func(*PublicipGetRequest) {
 	return func(sr *PublicipGetRequest) {
 		sr.ResourceID = PublicipID
 	}

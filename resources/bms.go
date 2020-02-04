@@ -70,7 +70,7 @@ func (bg BMSGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (bg BMSGet) WithResourceId(ResourceId string) func(*BMSGetRequest) {
+func (bg BMSGet) WithResourceID(ResourceId string) func(*BMSGetRequest) {
 	return func(bgr *BMSGetRequest) {
 		bgr.ResourceId = ResourceId
 	}

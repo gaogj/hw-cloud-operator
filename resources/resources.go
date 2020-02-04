@@ -73,6 +73,7 @@ func NewResources() *Resources {
 		VPC: &VPC{
 			GetVPC: newVPCGetFunc(),
 			GetSubnet: newSubnetGetFunc(),
+			GetPublicip: newPublicipGetFunc(),
 		},
 		IAM: &IAM{
 			GetUser: newUserGetFunc(),

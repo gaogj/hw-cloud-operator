@@ -68,7 +68,7 @@ func (dg DCSGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (dg DCSGet) WithResourceId(ResourceId string) func(*DCSGetRequest) {
+func (dg DCSGet) WithResourceID(ResourceId string) func(*DCSGetRequest) {
 	return func(dgr *DCSGetRequest) {
 		dgr.ResourceId = ResourceId
 	}

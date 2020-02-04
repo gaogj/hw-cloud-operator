@@ -72,7 +72,7 @@ func (eg RDSGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (dg RDSGet) WithResourceId(ResourceId string) func(*RDSGetRequest) {
+func (dg RDSGet) WithResourceID(ResourceId string) func(*RDSGetRequest) {
 	return func(dgr *RDSGetRequest) {
 		dgr.ResourceId = ResourceId
 	}

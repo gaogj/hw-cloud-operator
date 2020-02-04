@@ -70,7 +70,7 @@ func (eg ECSGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (eg ECSGet) WithResourceId(ResourceId string) func(*ECSGetRequest) {
+func (eg ECSGet) WithResourceID(ResourceId string) func(*ECSGetRequest) {
 	return func(egr *ECSGetRequest) {
 		egr.ResourceId = ResourceId
 	}
