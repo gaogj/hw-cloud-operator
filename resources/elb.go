@@ -56,7 +56,7 @@ func (eg ELBGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (eg ELBGet) WithResourceId(ResourceId string) func(*ELBGetRequest) {
+func (eg ELBGet) WithResourceID(ResourceId string) func(*ELBGetRequest) {
 	return func(egr *ELBGetRequest) {
 		egr.ResourceId = ResourceId
 	}
@@ -114,7 +114,7 @@ func (eg ListenerGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (lg ListenerGet) WithResourceId(ResourceId string) func(*ListenerGetRequest) {
+func (lg ListenerGet) WithResourceID(ResourceId string) func(*ListenerGetRequest) {
 	return func(lgr *ListenerGetRequest) {
 		lgr.ResourceId = ResourceId
 	}
