@@ -56,8 +56,8 @@ func (eg SLBGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-func (eg SLBGet) WithResourceID(ResourceId string) func(*ELBGetRequest) {
-	return func(egr *ELBGetRequest) {
+func (eg SLBGet) WithResourceID(ResourceId string) func(*SLBGetRequest) {
+	return func(egr *SLBGetRequest) {
 		egr.ResourceId = ResourceId
 	}
 }
