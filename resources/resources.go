@@ -10,6 +10,7 @@ type Resources struct {
 	DCS *DCS
 	RDS *RDS
 	ELB *ELB
+	SLB *SLB
 	//DMS *DMS
 }
 
@@ -53,6 +54,10 @@ type ELB struct {
 	GetL7Policies L7PolicieGet
 	ListL7Policies L7PolicieList
 	ListL7PolicieRules L7PolicieRulesList
+}
+
+type SLB struct {
+	GetSLB SLBGet
 }
 
 type IAM struct {
@@ -110,6 +115,9 @@ func NewResources() *Resources {
 			GetL7Policies: newL7PolicieGetFunc(),
 			ListL7Policies: newL7PolicieListFunc(),
 			ListL7PolicieRules: newL7PolicieRulesListFunc(),
+		},
+		SLB: &SLB{
+			GetSLB: newSLBGetFunc(),
 		},
 	}
 }
