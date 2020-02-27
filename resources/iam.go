@@ -137,7 +137,7 @@ func (ug GroupGetRequest) Do() (*http.Response, error) {
 	return res, nil
 }
 
-//GetUserInfo
+//CreateUserInfo
 func newUserCreateFunc() UserCreate {
 	return func(endpoint, name, password string, o ...func(*UserCreateRequest)) (*http.Response, error) {
 		var r = UserCreateRequest{
@@ -319,6 +319,64 @@ func (lgfu ListGroupsForUserRequest) Do() (*http.Response, error) {
 		apiObject: "users",
 		method: "GET",
 		scheme: "https",
+		params: make(map[string]string),
+	}
+
+	req, err := newRequest(RequestInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+//DeleteUserInfo
+func newUserDeleteFunc() UserDelete {
+	return func(endpoint, userId string, o ...func(*UserDeleteRequest)) (*http.Response, error) {
+		var r = UserDeleteRequest{
+			UserId: userId,
+			Endpoint: endpoint,
+		}
+		for _, f := range o {
+			f(&r)
+		}
+		return r.Do()
+	}
+}
+
+type UserDelete func(endpoint, userId string, o ...func(*UserDeleteRequest)) (*http.Response, error)
+
+type UserDeleteRequest struct {
+	ProjectId string
+	Endpoint string
+
+	UserId string
+}
+
+func (ud UserDeleteRequest) Do() (*http.Response, error) {
+	var body *bytes.Buffer
+
+	body = new(bytes.Buffer)
+	defer body.Reset()
+
+	if Endpoints[ud.Endpoint].Host == "" {
+		return nil,errors.New("Can't find the Endpoint host")
+	}
+
+	RequestInfo := RequestInfo{
+		endpoint:Endpoints[ud.Endpoint].Host,
+		resourceId: ud.UserId,
+		apiVersion: "v3",
+		category: "iam",
+		apiObject: "users",
+		method: "DELETE",
+		scheme: "https",
+		body: nil,
 		params: make(map[string]string),
 	}
 
